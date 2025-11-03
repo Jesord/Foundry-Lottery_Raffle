@@ -8,7 +8,7 @@ import {Raffle} from "src/Raffle.sol";
 import {HelperConfig} from "script/HelperConfig.s.sol";
 import {Vm} from "forge-std/Vm.sol";
 import {VRFCoordinatorV2_5Mock} from "@chainlink/contracts/src/v0.8/vrf/mocks/VRFCoordinatorV2_5Mock.sol";
-import {CodeConstants} from "Script/HelperConfig.s.sol";
+import {CodeConstants} from "script/HelperConfig.s.sol";
 
 contract RaffleTest is CodeConstants, Test {
     Raffle public raffle;
@@ -134,7 +134,7 @@ contract RaffleTest is CodeConstants, Test {
 
     function testPerformUpKeepUpdatesRaffleStateAndEmitsRequestId() public raffleEntered {
         vm.recordLogs();
-        raffle.performUpKeep("");
+        raffle.performUpkeep("");
         Vm.Log[] memory entries = vm.getRecordedLogs();
         bytes32 requestId = entries[1].topics[1];
 
@@ -144,7 +144,7 @@ contract RaffleTest is CodeConstants, Test {
     }
 
     modifier skipFork() {
-        if (block.chainId != LOCAL_CHAIN_ID) {
+        if (block.chainid != LOCAL_CHAIN_ID) {
             return;
         }
         _;
@@ -161,7 +161,7 @@ contract RaffleTest is CodeConstants, Test {
 
     function testfulfillRandomWordsPicksAWinnerResetsAndSendsMoney() public raffleEntered {
         uint256 additionalEntrants = 3;
-        uint256 atartinIndex = 1;
+        uint256 startingIndex = 1;
         address expectedWinner = address(1);
 
         for (uint256 i = startingIndex; i < startingIndex + additionalEntrants; i++) {
@@ -174,7 +174,7 @@ contract RaffleTest is CodeConstants, Test {
         uint256 winnerStartingBalance = expectedWinner.balance;
 
         vm.recordLogs();
-        raffle.performUpKeep("");
+        raffle.performUpkeep("");
         Vm.Log[] memory entries = vm.getRecordedLogs();
         bytes32 requestId = entries[1].topics[1];
         VRFCoordinatorV2_5Mock(vrfCoordinator).fulfillRandomWords(uint256(requestId), address(raffle));
@@ -186,7 +186,7 @@ contract RaffleTest is CodeConstants, Test {
         uint256 prize = entranceFee * (additionalEntrants + 1);
 
         assert(recentWinner == expectedWinner);
-        assert(uint256(raffleState) = 0);
+        assert(uint256(raffleState) == 0);
         assert(winnerBalance == winnerStartingBalance + prize);
         assert(endingTimeStamp > startingTimeStamp);
     }
